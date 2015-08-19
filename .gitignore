@@ -1,0 +1,16 @@
+# Composer
+vendor/
+composer.lock
+
+# Unit test coverage reports
+tests/coverage/html/
+
+# PHPStorm
+.idea/
+
+# Netbeans
+nbproject/
+nbdist/
+nbactions.xml
+nb-configuration.xml
+.nb-gradle/

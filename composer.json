@@ -1,0 +1,17 @@
+{
+    "name": "sam-burns/behat-context-file-usage",
+
+    "version": "0.1.0",
+
+    "license": "MIT",
+
+    "require": {
+        "phpunit/php-code-coverage": ">=2.0.0 <4.0.0"
+    },
+
+    "autoload": {
+        "psr-0": {
+            "BehatContextFileUsage": "src/"
+        }
+    }
+}
