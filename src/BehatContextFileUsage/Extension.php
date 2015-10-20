@@ -12,19 +12,21 @@ use PHP_CodeCoverage_Report_HTML as CodeCoverageWriter;
 class Extension implements ExtensionInterface
 {
     /**
-     * Returns the extension config key.
+     * Loads extension services into temporary container.
      *
-     * @return string
+     * @param ContainerBuilder $container
+     * @param array            $config
      */
-    public function getConfigKey()
+    public function load(ContainerBuilder $container, array $config)
     {
-        return 'context_code_usage';
-    }
+        $eventDispatcher = $container->get('event_dispatcher');
+        /** @var $eventDispatcher \Behat\Testwork\EventDispatcher\TestworkEventDispatcher */
 
-    /**
-     * @{inheritdoc}
-     */
-    public function initialize(ExtensionManager $extensionManager) {}
+        $coverageCalculator = new CoverageCalculator(new CodeCoverageMonitor(), new CodeCoverageWriter(), $config);
+
+        $eventDispatcher->addListener(ExerciseCompleted::BEFORE, [$coverageCalculator, 'beNotifiedOfExerciseStartedEvent'],  1);
+        $eventDispatcher->addListener(ExerciseCompleted::AFTER,  [$coverageCalculator, 'beNotifiedOfExerciseFinishedEvent'], 1);
+    }
 
     /**
      * Setups configuration for the extension.
@@ -43,24 +45,20 @@ class Extension implements ExtensionInterface
     }
 
     /**
-     * Loads extension services into temporary container.
-     *
-     * @param ContainerBuilder $container
-     * @param array            $config
+     * {@inheritdoc}
      */
-    public function load(ContainerBuilder $container, array $config)
+    public function getConfigKey()
     {
-        $eventDispatcher = $container->get('event_dispatcher');
-        /** @var $eventDispatcher \Behat\Testwork\EventDispatcher\TestworkEventDispatcher */
-
-        $coverageCalculator = new CoverageCalculator(new CodeCoverageMonitor(), new CodeCoverageWriter(), $config);
-
-        $eventDispatcher->addListener(ExerciseCompleted::BEFORE, [$coverageCalculator, 'beNotifiedOfExerciseStartedEvent'],  1);
-        $eventDispatcher->addListener(ExerciseCompleted::AFTER,  [$coverageCalculator, 'beNotifiedOfExerciseFinishedEvent'], 1);
+        return 'context_code_usage';
     }
 
     /**
-     * @param ContainerBuilder $container
+     * {@inheritdoc}
+     */
+    public function initialize(ExtensionManager $extensionManager) {}
+
+    /**
+     * {@inheritdoc}
      */
     public function process(ContainerBuilder $container) {}
 }
