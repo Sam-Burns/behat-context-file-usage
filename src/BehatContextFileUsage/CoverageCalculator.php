@@ -1,28 +1,25 @@
 <?php
 namespace BehatContextFileUsage;
 
-use PHP_CodeCoverage as CodeCoverageMonitor;
-use PHP_CodeCoverage_Report_HTML as CodeCoverageWriter;
-
 class CoverageCalculator
 {
-    /** @var CodeCoverageMonitor */
+    /** @var \PHP_CodeCoverage */
     private $codeCoverageMonitor;
 
-    /** @var CodeCoverageWriter */
+    /** @var \PHP_CodeCoverage_Report_HTML */
     private $codeCoverageWriter;
 
     /** @var string */
     private $reportFolder;
 
     /**
-     * @param CodeCoverageMonitor $codeCoverageMonitor,
-     * @param CodeCoverageWriter  $codeCoverageWriter,
-     * @param string[]            $config
+     * @param \PHP_CodeCoverage              $codeCoverageMonitor,
+     * @param \PHP_CodeCoverage_Report_HTML  $codeCoverageWriter,
+     * @param string[]                       $config
      */
     public function __construct(
-        CodeCoverageMonitor $codeCoverageMonitor,
-        CodeCoverageWriter  $codeCoverageWriter,
+        \PHP_CodeCoverage              $codeCoverageMonitor,
+        \PHP_CodeCoverage_Report_HTML  $codeCoverageWriter,
         $config
     ) {
         $this->codeCoverageMonitor = $codeCoverageMonitor;

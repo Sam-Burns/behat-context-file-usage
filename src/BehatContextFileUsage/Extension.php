@@ -12,8 +12,6 @@ use PHP_CodeCoverage_Report_HTML as CodeCoverageWriter;
 class Extension implements ExtensionInterface
 {
     /**
-     * Loads extension services into temporary container.
-     *
      * @param ContainerBuilder $container
      * @param array            $config
      */
@@ -29,8 +27,6 @@ class Extension implements ExtensionInterface
     }
 
     /**
-     * Setups configuration for the extension.
-     *
      * @param ArrayNodeDefinition $builder
      */
     public function configure(ArrayNodeDefinition $builder)
