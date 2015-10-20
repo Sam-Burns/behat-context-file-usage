@@ -1,5 +1,5 @@
 <?php
-namespace BehatContextFileUsage\ContextCodeUsage;
+namespace BehatContextFileUsage;
 
 use Behat\Testwork\ServiceContainer\Extension as ExtensionInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;

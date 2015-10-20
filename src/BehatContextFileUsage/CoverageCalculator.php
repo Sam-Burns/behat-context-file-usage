@@ -1,5 +1,5 @@
 <?php
-namespace BehatContextFileUsage\ContextCodeUsage;
+namespace BehatContextFileUsage;
 
 use PHP_CodeCoverage as CodeCoverageMonitor;
 use PHP_CodeCoverage_Report_HTML as CodeCoverageWriter;
