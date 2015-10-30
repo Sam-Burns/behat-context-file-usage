@@ -1,33 +1,40 @@
 <?php
 namespace BehatContextFileUsage;
 
+use Behat\Testwork\EventDispatcher\Event\SuiteTested;
 use Behat\Testwork\ServiceContainer\Extension as ExtensionInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Behat\Testwork\ServiceContainer\ExtensionManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Behat\Testwork\EventDispatcher\Event\ExerciseCompleted;
+use Behat\Testwork\EventDispatcher\TestworkEventDispatcher;
 use PHP_CodeCoverage as CodeCoverageMonitor;
 use PHP_CodeCoverage_Report_HTML as CodeCoverageWriter;
 
 class Extension implements ExtensionInterface
 {
     /**
-     * @param ContainerBuilder $container
-     * @param array            $config
+     * {@inheritdoc}
      */
     public function load(ContainerBuilder $container, array $config)
     {
-        $eventDispatcher = $container->get('event_dispatcher');
-        /** @var $eventDispatcher \Behat\Testwork\EventDispatcher\TestworkEventDispatcher */
+        $eventDispatcher = $container->get('event_dispatcher'); /** @var $eventDispatcher TestworkEventDispatcher */
 
-        $coverageCalculator = new CoverageCalculator(new CodeCoverageMonitor(), new CodeCoverageWriter(), $config);
+        $coverageCalculator = new CoverageCalculator(
+            new PhpUnitCodeCoverageTool(
+                new CodeCoverageMonitor(),
+                new CodeCoverageWriter(),
+                $config
+            )
+        );
 
-        $eventDispatcher->addListener(ExerciseCompleted::BEFORE, [$coverageCalculator, 'beNotifiedOfExerciseStartedEvent'],  1);
-        $eventDispatcher->addListener(ExerciseCompleted::AFTER,  [$coverageCalculator, 'beNotifiedOfExerciseFinishedEvent'], 1);
+        $eventDispatcher->addListener(SuiteTested::BEFORE,      [$coverageCalculator, 'beNotifiedOfSuiteStartingEvent'],    100);
+        $eventDispatcher->addListener(SuiteTested::AFTER,       [$coverageCalculator, 'beNotifiedOfSuiteFinishingEvent'],   100);
+        $eventDispatcher->addListener(ExerciseCompleted::AFTER, [$coverageCalculator, 'beNotifiedOfExerciseFinishedEvent'], 100);
     }
 
     /**
-     * @param ArrayNodeDefinition $builder
+     * {@inheritdoc}
      */
     public function configure(ArrayNodeDefinition $builder)
     {

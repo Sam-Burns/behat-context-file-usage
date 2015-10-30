@@ -1,58 +1,79 @@
 <?php
 namespace BehatContextFileUsage;
 
+use Behat\Testwork\EventDispatcher\TestworkEventDispatcher as EventDispatcher;
+use Behat\Testwork\EventDispatcher\Event\LifecycleEvent as Event;
+use Behat\Testwork\EventDispatcher\Event\SuiteTested as SuiteTestedEvent;
+use Behat\Testwork\EventDispatcher\Event\ExerciseCompleted as ExerciseCompletedEvent;
+
 class CoverageCalculator
 {
-    /** @var \PHP_CodeCoverage */
-    private $codeCoverageMonitor;
-
-    /** @var \PHP_CodeCoverage_Report_HTML */
-    private $codeCoverageWriter;
-
-    /** @var string */
-    private $reportFolder;
+    /** @var PhpunitCodeCoverageTool */
+    private $phpUnitCodeCoverageTool;
 
     /**
-     * @param \PHP_CodeCoverage              $codeCoverageMonitor,
-     * @param \PHP_CodeCoverage_Report_HTML  $codeCoverageWriter,
-     * @param string[]                       $config
+     * @param PhpunitCodeCoverageTool $phpUnitCodeCoverageTool
      */
-    public function __construct(
-        \PHP_CodeCoverage              $codeCoverageMonitor,
-        \PHP_CodeCoverage_Report_HTML  $codeCoverageWriter,
-        $config
-    ) {
-        $this->codeCoverageMonitor = $codeCoverageMonitor;
-        $this->codeCoverageWriter  = $codeCoverageWriter;
-
-        $this->reportFolder  = $config['report_folder'];
-
-        $codeCoverageMonitor->filter()->addDirectoryToWhitelist($config['context_folder']);
+    public function __construct(PhpunitCodeCoverageTool $phpUnitCodeCoverageTool)
+    {
+        $this->phpUnitCodeCoverageTool = $phpUnitCodeCoverageTool;
     }
 
-    public function beNotifiedOfExerciseStartedEvent()
+    /**
+     * @throws \InvalidArgumentException
+     *
+     * @param Event           $event
+     * @param string          $eventName
+     * @param EventDispatcher $eventDispatcher
+     */
+    public function beNotifiedOfSuiteStartingEvent(Event $event, $eventName, EventDispatcher $eventDispatcher)
     {
-        $this->startRecordingCodeUsage();
+        $this->verifyEventType(SuiteTestedEvent::BEFORE, $eventName);
+
+        $suiteName = $event->getSuite()->getName();
+
+        $this->phpUnitCodeCoverageTool->startRecordingCodeUsageWithTestName($suiteName);
     }
 
-    public function beNotifiedOfExerciseFinishedEvent()
+    /**
+     * @throws \InvalidArgumentException
+     *
+     * @param Event           $event
+     * @param string          $eventName
+     * @param EventDispatcher $eventDispatcher
+     */
+    public function beNotifiedOfSuiteFinishingEvent(Event $event, $eventName, EventDispatcher $eventDispatcher)
     {
-        $this->stopRecordingCodeUsage();
-        $this->publishCodeUsageReport();
+        $this->verifyEventType(SuiteTestedEvent::AFTER, $eventName);
+
+        $this->phpUnitCodeCoverageTool->stopRecordingCodeUsage();
     }
 
-    private function startRecordingCodeUsage()
+    /**
+     * @throws \InvalidArgumentException
+     *
+     * @param Event           $event
+     * @param string          $eventName
+     * @param EventDispatcher $eventDispatcher
+     */
+    public function beNotifiedOfExerciseFinishedEvent(Event $event, $eventName, EventDispatcher $eventDispatcher)
     {
-        $this->codeCoverageMonitor->start('everything');
+        $this->verifyEventType(ExerciseCompletedEvent::AFTER, $eventName);
+
+        $this->phpUnitCodeCoverageTool->stopRecordingCodeUsage();
+        $this->phpUnitCodeCoverageTool->publishCodeUsageReport();
     }
 
-    private function stopRecordingCodeUsage()
+    /**
+     * @throws \InvalidArgumentException
+     *
+     * @param string $expectedEventType
+     * @param string $actualEventType
+     */
+    private function verifyEventType($expectedEventType, $actualEventType)
     {
-        $this->codeCoverageMonitor->stop();
-    }
-
-    private function publishCodeUsageReport()
-    {
-        $this->codeCoverageWriter->process($this->codeCoverageMonitor, $this->reportFolder);
+        if ($actualEventType !== $expectedEventType) {
+            throw new \InvalidArgumentException('Listener called with wrong event');
+        }
     }
 }
