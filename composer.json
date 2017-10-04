@@ -6,7 +6,7 @@
     "license": "MIT",
 
     "require": {
-        "phpunit/php-code-coverage": ">=2.0.0 <4.0.0",
+        "phpunit/php-code-coverage": "^4.0.4",
         "behat/behat":               "^3.0.0"
     },
 
