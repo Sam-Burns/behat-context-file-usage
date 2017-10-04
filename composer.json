@@ -1,8 +1,6 @@
 {
     "name": "sam-burns/behat-context-file-usage",
 
-    "version": "2.1.0",
-
     "license": "MIT",
 
     "require": {
