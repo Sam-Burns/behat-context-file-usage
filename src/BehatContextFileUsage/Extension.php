@@ -8,8 +8,8 @@ use Behat\Testwork\ServiceContainer\ExtensionManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Behat\Testwork\EventDispatcher\Event\ExerciseCompleted;
 use Behat\Testwork\EventDispatcher\TestworkEventDispatcher;
-use PHP_CodeCoverage as CodeCoverageMonitor;
-use PHP_CodeCoverage_Report_HTML as CodeCoverageWriter;
+use SebastianBergmann\CodeCoverage\CodeCoverage;
+use SebastianBergmann\CodeCoverage\Report\Html\Facade as HtmlReport;
 
 class Extension implements ExtensionInterface
 {
@@ -22,8 +22,8 @@ class Extension implements ExtensionInterface
 
         $coverageCalculator = new CoverageCalculator(
             new PhpUnitCodeCoverageTool(
-                new CodeCoverageMonitor(),
-                new CodeCoverageWriter(),
+                new CodeCoverage(),
+                new HtmlReport(),
                 $config
             )
         );
